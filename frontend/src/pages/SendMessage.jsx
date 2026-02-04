@@ -50,9 +50,30 @@ export default function SendMessage() {
 
   const copyToClipboard = async () => {
     if (result?.inbox_url) {
-      await navigator.clipboard.writeText(result.inbox_url);
-      setCopied(true);
-      toast.success("Link copied to clipboard");
+      try {
+        // Try modern Clipboard API first
+        await navigator.clipboard.writeText(result.inbox_url);
+        setCopied(true);
+        toast.success("Link copied to clipboard");
+      } catch (err) {
+        // Fallback for restricted environments (iframes, etc.)
+        const textArea = document.createElement("textarea");
+        textArea.value = result.inbox_url;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          setCopied(true);
+          toast.success("Link copied to clipboard");
+        } catch (execErr) {
+          toast.error("Copy failed - please select and copy manually");
+        }
+        document.body.removeChild(textArea);
+      }
       setTimeout(() => setCopied(false), 2000);
     }
   };
