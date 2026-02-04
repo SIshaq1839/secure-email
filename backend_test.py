@@ -2,6 +2,7 @@ import requests
 import sys
 import json
 from datetime import datetime
+import uuid
 
 class SecureBridgeAPITester:
     def __init__(self, base_url="https://securenotify-1.preview.emergentagent.com"):
@@ -10,6 +11,10 @@ class SecureBridgeAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.created_message_id = None
+        self.auth_token = None
+        self.test_user_email = f"test_{uuid.uuid4().hex[:8]}@example.com"
+        self.test_user_password = "TestPassword123!"
+        self.test_user_name = "Test User"
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
