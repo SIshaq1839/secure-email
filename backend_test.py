@@ -420,6 +420,7 @@ class SecureBridgeAPITester:
     def test_access_other_user_message(self):
         """Test accessing a message that belongs to another user"""
         # Create a second user and message
+        import uuid
         second_user_email = f"test2_{uuid.uuid4().hex[:8]}@example.com"
         
         # Register second user
