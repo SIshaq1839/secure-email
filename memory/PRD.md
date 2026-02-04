@@ -28,6 +28,10 @@ Build a functional and elegantly designed Proof of Concept (POC) for a secure "N
 - ✅ Auto-mark messages as read on view
 - ✅ Toast notifications for user feedback
 - ✅ Clean, minimalist SaaS UI with Inter font
+- ✅ **JWT Authentication** - Register/Login with email & password
+- ✅ **User-specific Inboxes** - Each user sees only messages sent to their email
+- ✅ **Protected Routes** - Inbox requires authentication
+- ✅ **Sender Attribution** - Messages show sender info if authenticated
 
 ## P0/P1/P2 Features Remaining
 ### P1 (Nice to have)
