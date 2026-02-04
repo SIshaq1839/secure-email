@@ -403,17 +403,8 @@ class SecureBridgeAPITester:
             "Unauthorized Messages Access",
             "GET",
             "messages",
-            401  # Should be 401 for missing auth, but backend returns 403
+            403  # Backend correctly returns 403 for missing auth
         )
-        
-        # Backend actually returns 403, so let's accept that
-        if not success:
-            success, response = self.run_test(
-                "Unauthorized Messages Access (403)",
-                "GET",
-                "messages",
-                403
-            )
         
         return success
 
