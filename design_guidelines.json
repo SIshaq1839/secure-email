@@ -1,0 +1,123 @@
+{
+  "identity": {
+    "name": "SecureBridge",
+    "aesthetic": "Clean & Quiet SaaS",
+    "description": "A minimalist, high-end secure messaging portal focusing on trust, clarity, and speed.",
+    "principles": [
+      "Radical Simplicity: If it's not essential, remove it.",
+      "Trust through Clarity: White space and clean typography build confidence.",
+      "Speed is a Feature: Interactions should feel instant.",
+      "Secure by Design: Visual cues (lock icons, badges) constantly reassure the user."
+    ]
+  },
+  "typography": {
+    "font_family": {
+      "sans": "Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+    },
+    "styles": {
+      "h1": "text-3xl md:text-4xl font-semibold tracking-tight text-slate-900",
+      "h2": "text-2xl font-medium tracking-tight text-slate-900",
+      "h3": "text-xl font-medium text-slate-900",
+      "body": "text-base text-slate-600 leading-relaxed",
+      "small": "text-sm text-slate-500",
+      "label": "text-sm font-medium text-slate-700 mb-1.5 block"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#2563EB",
+        "hover": "#1D4ED8",
+        "foreground": "#FFFFFF"
+      },
+      "background": {
+        "DEFAULT": "#FFFFFF",
+        "subtle": "#F9FAFB"
+      },
+      "surface": {
+        "DEFAULT": "#FFFFFF",
+        "hover": "#F3F4F6"
+      },
+      "border": {
+        "DEFAULT": "#F3F4F6",
+        "strong": "#E5E7EB"
+      },
+      "text": {
+        "primary": "#0F172A",
+        "secondary": "#64748B",
+        "muted": "#94A3B8"
+      },
+      "status": {
+        "success": "#10B981",
+        "success_bg": "#ECFDF5",
+        "error": "#EF4444",
+        "error_bg": "#FEF2F2",
+        "secure": "#2563EB",
+        "secure_bg": "#EFF6FF"
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm hover:shadow transition-all duration-200 font-medium px-6 py-2.5 rounded-lg active:scale-95",
+      "secondary": "bg-white border border-gray-200 text-slate-700 hover:bg-gray-50 hover:text-slate-900 transition-colors font-medium px-4 py-2 rounded-lg",
+      "ghost": "bg-transparent hover:bg-gray-100 text-slate-600 hover:text-slate-900 transition-colors px-3 py-2 rounded-md"
+    },
+    "cards": {
+      "base": "bg-white border border-gray-100 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-6 md:p-8",
+      "hoverable": "hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] hover:border-gray-200 transition-all duration-300"
+    },
+    "inputs": {
+      "base": "flex h-11 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all"
+    },
+    "badges": {
+      "secure": "inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10",
+      "unread": "h-2 w-2 rounded-full bg-[#2563EB]"
+    }
+  },
+  "layout_strategies": {
+    "dashboard": {
+      "container": "max-w-3xl mx-auto px-4 py-12 md:py-20",
+      "header": "flex items-center justify-between mb-8 md:mb-12",
+      "list": "space-y-2"
+    },
+    "detail_view": {
+      "container": "max-w-2xl mx-auto px-4 py-12 md:py-20",
+      "card": "bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden",
+      "header": "bg-gray-50/50 border-b border-gray-100 px-6 py-4 flex items-center justify-between",
+      "content": "p-6 md:p-10 prose prose-slate max-w-none"
+    },
+    "send_form": {
+      "container": "max-w-md mx-auto px-4 py-20 flex flex-col justify-center min-h-[80vh]",
+      "form_wrapper": "space-y-6"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": "Use extremely subtle shadows. The 'Clean & Quiet' look relies on borders and whitespace more than heavy drop shadows.",
+    "borders": "Use 'border-gray-100' for almost everything. It should be barely visible, just enough to define structure.",
+    "whitespace": "Be generous. Use 'py-12', 'py-20', 'gap-8'. Don't cram content.",
+    "icons": "Use Lucide React icons. Stroke width 1.5px or 2px. Keep them small and elegant."
+  },
+  "image_urls": {
+    "hero_background": "https://images.unsplash.com/photo-1760224254103-3dcc15e4ad9d?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "secure_icon_fallback": "https://images.unsplash.com/photo-1580802379330-f1bbb7dd532e?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "instructions_to_main_agent": [
+    "Implement the 'Send Message' flow at '/api/send' (backend) and '/' (frontend send form).",
+    "Implement the 'Inbox' flow at '/inbox' (frontend list).",
+    "Implement the 'Message Detail' flow at '/inbox/:id' (frontend detail).",
+    "Use the 'Clean & Quiet' palette strictly. No dark mode for this POC (unless toggled, but default to light).",
+    "Ensure the 'Secure Connection' badge is visible on the detail view.",
+    "Use 'sonner' for toast notifications (e.g., 'Message sent securely').",
+    "Add 'data-testid' to all interactive elements."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not use generic centered layouts without purpose.",
+    "Create depth through subtle borders and very light shadows.",
+    "Use 'transition-all duration-200' for smooth interactions.",
+    "Never use AI assistant emojis.",
+    "Prioritize 'Inter' font with 'tracking-tight' for headings.",
+    "Use 'sonner' for notifications."
+  ]
+}
