@@ -541,18 +541,25 @@ class SecureBridgeAPITester:
         return True
 
 def main():
-    print("🚀 Starting SecureBridge API Tests")
-    print("=" * 50)
+    print("🚀 Starting SecureBridge API Tests with Authentication")
+    print("=" * 60)
     
     tester = SecureBridgeAPITester()
     
-    # Run all tests
+    # Run all tests in order
     tests = [
         ("API Health Check", tester.test_health_check),
-        ("Send Message", tester.test_send_message),
-        ("Get All Messages", tester.test_get_messages),
-        ("Get Specific Message", tester.test_get_specific_message),
-        ("Message Not Found", tester.test_message_not_found),
+        ("User Registration", tester.test_register_user),
+        ("User Login", tester.test_login_user),
+        ("Get Current User", tester.test_get_current_user),
+        ("Invalid Login", tester.test_invalid_login),
+        ("Duplicate Registration", tester.test_duplicate_registration),
+        ("Send Unauthenticated Message", tester.test_send_message),
+        ("Send Authenticated Message", tester.test_send_authenticated_message),
+        ("Get User Messages", tester.test_get_user_messages),
+        ("Get Specific Message (Authenticated)", tester.test_get_specific_message_authenticated),
+        ("Unauthorized Access", tester.test_unauthorized_access),
+        ("Access Other User's Message", tester.test_access_other_user_message),
         ("Read Status Change", tester.test_read_status_change),
     ]
     
@@ -565,7 +572,7 @@ def main():
             print(f"❌ {test_name} failed with exception: {str(e)}")
     
     # Print final results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     print(f"📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.tests_passed == tester.tests_run:
