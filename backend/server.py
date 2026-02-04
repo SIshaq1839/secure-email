@@ -1,12 +1,12 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -27,44 +27,86 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class MessageCreate(BaseModel):
+    recipient_email: EmailStr
+    subject: str
+    body: str
+
+
+class MessageResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    id: str
+    recipient_email: str
+    subject: str
+    body: str
+    is_read: bool
+    created_at: str
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
 
-# Add your routes to the router instead of directly to app
+class SendMessageResponse(BaseModel):
+    message_id: str
+    inbox_url: str
+    message: str
+
+
+# Health check endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "SecureBridge API is running"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+# Send a new secure message
+@api_router.post("/send", response_model=SendMessageResponse)
+async def send_message(message_data: MessageCreate):
+    message_id = str(uuid.uuid4())
+    created_at = datetime.now(timezone.utc).isoformat()
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    message_doc = {
+        "id": message_id,
+        "recipient_email": message_data.recipient_email,
+        "subject": message_data.subject,
+        "body": message_data.body,
+        "is_read": False,
+        "created_at": created_at
+    }
     
-    return status_checks
+    await db.messages.insert_one(message_doc)
+    
+    # Get the frontend URL from environment or use default
+    frontend_url = os.environ.get('FRONTEND_URL', '')
+    inbox_url = f"{frontend_url}/inbox/{message_id}"
+    
+    return SendMessageResponse(
+        message_id=message_id,
+        inbox_url=inbox_url,
+        message="Message sent securely. Share the inbox URL with the recipient."
+    )
+
+
+# Get a specific message by ID (marks as read)
+@api_router.get("/message/{message_id}", response_model=MessageResponse)
+async def get_message(message_id: str):
+    # Find and update the message to mark as read
+    message = await db.messages.find_one_and_update(
+        {"id": message_id},
+        {"$set": {"is_read": True}},
+        projection={"_id": 0},
+        return_document=True
+    )
+    
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return MessageResponse(**message)
+
+
+# Get all messages (for inbox view)
+@api_router.get("/messages", response_model=List[MessageResponse])
+async def get_messages():
+    messages = await db.messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return [MessageResponse(**msg) for msg in messages]
+
 
 # Include the router in the main app
 app.include_router(api_router)
