@@ -2,16 +2,18 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Lock, Send, Inbox, Copy, Check, Shield } from "lucide-react";
+import { Lock, Send, Inbox, Copy, Check, Shield, LogIn, User } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function SendMessage() {
+  const { user, logout } = useAuth();
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -29,11 +31,14 @@ export default function SendMessage() {
 
     setLoading(true);
     try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
       const response = await axios.post(`${API}/send`, {
         recipient_email: email,
         subject,
         body,
-      });
+      }, { headers });
       
       setResult(response.data);
       toast.success("Message sent securely");
@@ -89,16 +94,42 @@ export default function SendMessage() {
             </div>
             <span className="font-semibold text-slate-900 tracking-tight">SecureBridge</span>
           </div>
-          <Link to="/inbox">
-            <Button 
-              variant="ghost" 
-              className="text-slate-600 hover:text-slate-900 hover:bg-gray-100"
-              data-testid="view-inbox-btn"
-            >
-              <Inbox className="h-4 w-4 mr-2" />
-              View Inbox
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <Link to="/inbox">
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-600 hover:text-slate-900 hover:bg-gray-100"
+                    data-testid="view-inbox-btn"
+                  >
+                    <Inbox className="h-4 w-4 mr-2" />
+                    My Inbox
+                  </Button>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  onClick={logout}
+                  className="text-slate-600 hover:text-slate-900 hover:bg-gray-100"
+                  data-testid="logout-btn"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  {user.name}
+                </Button>
+              </>
+            ) : (
+              <Link to="/login">
+                <Button 
+                  variant="ghost" 
+                  className="text-slate-600 hover:text-slate-900 hover:bg-gray-100"
+                  data-testid="login-btn"
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -220,6 +251,14 @@ export default function SendMessage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Info for non-logged in users */}
+        {!user && (
+          <p className="text-center text-sm text-slate-400 mt-6">
+            <Link to="/register" className="text-[#2563EB] hover:underline">Create an account</Link>
+            {" "}to receive messages in your own inbox
+          </p>
         )}
       </main>
     </div>

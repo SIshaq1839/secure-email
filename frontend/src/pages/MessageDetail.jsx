@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, ArrowLeft, Mail, Clock, AlertCircle } from "lucide-react";
+import { Shield, Lock, ArrowLeft, Mail, Clock, AlertCircle, User } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -13,6 +14,7 @@ const API = `${BACKEND_URL}/api`;
 export default function MessageDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,10 +31,16 @@ export default function MessageDetail() {
       console.error(error);
       if (error.response?.status === 404) {
         setError("Message not found or has expired");
+      } else if (error.response?.status === 403) {
+        setError("You don't have permission to view this message");
+      } else if (error.response?.status === 401) {
+        toast.error("Please login to view this message");
+        navigate("/login");
+        return;
       } else {
         setError("Failed to load message");
       }
-      toast.error("Failed to load message");
+      toast.error(error.response?.data?.detail || "Failed to load message");
     } finally {
       setLoading(false);
     }
@@ -84,7 +92,7 @@ export default function MessageDetail() {
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <AlertCircle className="h-6 w-6 text-red-600" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">Message Not Found</h2>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Cannot View Message</h2>
             <p className="text-slate-500 mb-6">{error}</p>
             <Link to="/inbox">
               <Button 
@@ -105,12 +113,12 @@ export default function MessageDetail() {
       {/* Header */}
       <header className="border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-[#2563EB] flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" strokeWidth={2} />
             </div>
             <span className="font-semibold text-slate-900 tracking-tight">SecureBridge</span>
-          </div>
+          </Link>
           <Link to="/inbox">
             <Button 
               variant="ghost" 
@@ -150,7 +158,18 @@ export default function MessageDetail() {
                   {message.subject}
                 </h1>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
-                  <span data-testid="message-recipient">To: {message.recipient_email}</span>
+                  {message.sender_name && (
+                    <span className="flex items-center gap-1" data-testid="message-sender">
+                      <User className="h-3 w-3" />
+                      From: {message.sender_name} {message.sender_email && `(${message.sender_email})`}
+                    </span>
+                  )}
+                  {!message.sender_name && message.sender_email && (
+                    <span data-testid="message-sender">From: {message.sender_email}</span>
+                  )}
+                  {!message.sender_name && !message.sender_email && (
+                    <span data-testid="message-sender" className="text-slate-400">Anonymous sender</span>
+                  )}
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     <span data-testid="message-date">{formatFullDate(message.created_at)}</span>

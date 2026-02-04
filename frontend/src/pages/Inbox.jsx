@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Shield, Plus, Mail, Clock, ChevronRight, Inbox as InboxIcon } from "lucide-react";
+import { Shield, Plus, Mail, Clock, ChevronRight, Inbox as InboxIcon, LogOut, User } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export default function Inbox() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +27,12 @@ export default function Inbox() {
       setMessages(response.data);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load messages");
+      if (error.response?.status === 401) {
+        toast.error("Please login to view your inbox");
+        navigate("/login");
+      } else {
+        toast.error("Failed to load messages");
+      }
     } finally {
       setLoading(false);
     }
@@ -50,38 +58,61 @@ export default function Inbox() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    toast.success("Logged out successfully");
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-[#2563EB] flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" strokeWidth={2} />
             </div>
             <span className="font-semibold text-slate-900 tracking-tight">SecureBridge</span>
-          </div>
-          <Link to="/">
-            <Button 
-              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm hover:shadow transition-all duration-200"
-              data-testid="compose-message-btn"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Compose
-            </Button>
           </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/">
+              <Button 
+                className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm hover:shadow transition-all duration-200"
+                data-testid="compose-message-btn"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Compose
+              </Button>
+            </Link>
+            <Button 
+              variant="ghost" 
+              onClick={handleLogout}
+              className="text-slate-600 hover:text-slate-900 hover:bg-gray-100"
+              data-testid="logout-btn"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 py-8 md:py-12">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 mb-1">
-            Inbox
-          </h1>
-          <p className="text-slate-500 text-sm">
-            {messages.length} {messages.length === 1 ? "message" : "messages"}
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 mb-1">
+              Inbox
+            </h1>
+            <p className="text-slate-500 text-sm">
+              {user?.email} • {messages.length} {messages.length === 1 ? "message" : "messages"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <User className="h-4 w-4" />
+            <span>{user?.name}</span>
+          </div>
         </div>
 
         {loading ? (
@@ -97,14 +128,14 @@ export default function Inbox() {
             </div>
             <h3 className="text-lg font-medium text-slate-900 mb-2">No messages yet</h3>
             <p className="text-slate-500 text-sm mb-6">
-              Your secure inbox is empty. Start by sending a message.
+              Your secure inbox is empty. Messages sent to {user?.email} will appear here.
             </p>
             <Link to="/">
               <Button 
                 className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white"
                 data-testid="send-first-message-btn"
               >
-                Send First Message
+                Send a Test Message
               </Button>
             </Link>
           </Card>
@@ -154,7 +185,7 @@ export default function Inbox() {
                       <p className={`text-sm truncate ${
                         !message.is_read ? "text-slate-600" : "text-slate-400"
                       }`}>
-                        {message.recipient_email}
+                        {message.sender_name ? `From: ${message.sender_name}` : message.sender_email ? `From: ${message.sender_email}` : "Anonymous sender"}
                       </p>
                     </div>
 
