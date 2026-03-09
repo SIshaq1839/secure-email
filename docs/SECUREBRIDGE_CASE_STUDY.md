@@ -102,7 +102,7 @@ After the initial build was complete, I wanted each user to have their own inbox
 
 ```
 make a login module to login and check their email
-every user will have their own inbox
+every user will have their own inbox,
 ```
 
 Emergent added:
