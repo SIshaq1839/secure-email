@@ -398,7 +398,7 @@ Once running in production, you have full control to add compliance features:
 
 ---
 
-## 10. What's Next?
+## 12. What's Next?
 
 Future enhancements I'm considering:
 - Email notifications when messages are sent
