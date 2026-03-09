@@ -376,18 +376,17 @@ For production, use MongoDB Atlas instead of self-hosted MongoDB:
 
 Once running in production, you have full control to add compliance features:
 
-Once running locally, you have full control to:
-
-- **Add email integration** — Send notification emails with secure links (Resend, SendGrid)
-- **Deploy to your infrastructure** — AWS, Google Cloud, Vercel, or any hosting provider
-- **Switch databases** — Migrate to Firestore, PostgreSQL, or any database of your choice
-- **Add compliance features** — Audit logging, activity tracking, data retention policies
-- **Customize the design** — Modify styles, add your branding
-- **Enhance security** — Add 2FA, session management, IP restrictions
+- **Audit logging** — Track all user actions and data access
+- **Activity monitoring** — Log who viewed what and when
+- **Data retention policies** — Auto-delete messages after X days
+- **Encryption at rest** — Enable MongoDB encryption
+- **2FA** — Add two-factor authentication
+- **IP restrictions** — Whitelist allowed IP addresses
+- **Session management** — Token expiration, forced logout
 
 ---
 
-## 9. Key Takeaways
+## 11. Key Takeaways
 
 | Aspect | My Experience |
 |--------|---------------|
