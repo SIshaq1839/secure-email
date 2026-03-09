@@ -179,7 +179,200 @@ That's it! Your SecureBridge app is now running locally at `http://localhost:300
 
 ---
 
-## 8. Moving Toward Production
+## 8. Running with Docker (Recommended for Production)
+
+Docker makes it easy to run the entire application with a single command.
+
+### Step 1: Create Backend Dockerfile
+
+Create `backend/Dockerfile`:
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8001
+
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+```
+
+### Step 2: Create Frontend Dockerfile
+
+Create `frontend/Dockerfile`:
+```dockerfile
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY . .
+RUN yarn build
+
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Create `frontend/nginx.conf`:
+```nginx
+server {
+    listen 80;
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### Step 3: Create Docker Compose File
+
+Create `docker-compose.yml` in the root folder:
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: securebridge-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: securebridge-backend
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=securebridge
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - CORS_ORIGINS=*
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        - REACT_APP_BACKEND_URL=${BACKEND_URL:-http://localhost:8001}
+    container_name: securebridge-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+```
+
+### Step 4: Run Everything with One Command
+```bash
+# Build and start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+Your app is now running:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8001
+- MongoDB: localhost:27017
+
+---
+
+## 9. Deploying to Production
+
+### Option A: Deploy to a VPS (DigitalOcean, AWS EC2, etc.)
+
+1. **Set up your server** with Docker installed
+2. **Clone your repository** to the server
+3. **Create production `.env`** file:
+```bash
+JWT_SECRET=generate-a-strong-secret-key-here
+BACKEND_URL=https://api.yourdomain.com
+```
+
+4. **Run with Docker Compose**:
+```bash
+docker-compose -f docker-compose.yml up -d
+```
+
+5. **Set up reverse proxy** (Nginx/Caddy) for SSL:
+```nginx
+# /etc/nginx/sites-available/securebridge
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name api.yourdomain.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:8001;
+    }
+}
+```
+
+### Option B: Deploy Frontend to Vercel/Netlify
+
+1. **Push frontend to GitHub**
+2. **Connect to Vercel/Netlify**
+3. **Set environment variable**:
+   - `REACT_APP_BACKEND_URL` = your backend API URL
+
+### Option C: Deploy Backend to Railway/Render
+
+1. **Push backend to GitHub**
+2. **Connect to Railway or Render**
+3. **Set environment variables**:
+   - `MONGO_URL` = your MongoDB Atlas connection string
+   - `DB_NAME` = securebridge
+   - `JWT_SECRET` = your secret key
+   - `CORS_ORIGINS` = your frontend URL
+
+### Option D: Use MongoDB Atlas for Database
+
+For production, use MongoDB Atlas instead of self-hosted MongoDB:
+1. Create free cluster at mongodb.com/atlas
+2. Whitelist your server IP
+3. Update `MONGO_URL` in your environment
+
+---
+
+## 10. Moving Toward Compliance
 
 Once running locally, you have full control to:
 
