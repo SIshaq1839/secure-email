@@ -132,6 +132,7 @@ Create a `.env` file in the backend folder:
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=securebridge
 JWT_SECRET=your-secret-key-here
+CORS_ORIGINS=*
 ```
 
 Start the backend:
