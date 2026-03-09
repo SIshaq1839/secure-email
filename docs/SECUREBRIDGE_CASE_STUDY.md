@@ -374,6 +374,8 @@ For production, use MongoDB Atlas instead of self-hosted MongoDB:
 
 ## 10. Moving Toward Compliance
 
+Once running in production, you have full control to add compliance features:
+
 Once running locally, you have full control to:
 
 - **Add email integration** — Send notification emails with secure links (Resend, SendGrid)
