@@ -73,14 +73,7 @@ After I provided the prompt, Emergent's AI assistant (E1) asked me a few clarify
 - Authentication requirements
 - Additional features like message expiration
 
-I replied:
-
-```
-everything is up to you what takes less effort, and easy to make, 
-i already have firestore by the way
-```
-
-The assistant proceeded with MongoDB (already configured in the environment) and default settings.
+I told the assistant to proceed with whatever is easiest. The assistant used MongoDB (already configured in the environment) and default settings.
 
 Within a short time, Emergent generated the full application automatically.
 
