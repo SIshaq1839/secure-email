@@ -156,7 +156,23 @@ yarn start
 ```
 
 ### Step 5: Set Up MongoDB
-Make sure MongoDB is running locally, or use a cloud service like MongoDB Atlas.
+Make sure MongoDB is running locally:
+```
+# Install MongoDB (if not installed)
+# macOS: brew install mongodb-community
+# Ubuntu: sudo apt install mongodb
+
+# Start MongoDB
+mongod --dbpath /data/db
+```
+
+Or use **MongoDB Atlas** (free cloud tier):
+1. Create account at mongodb.com/atlas
+2. Create a free cluster
+3. Get connection string and update `.env`:
+```
+MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net
+```
 
 That's it! Your SecureBridge app is now running locally at `http://localhost:3000`
 
