@@ -86,11 +86,12 @@ The entire authentication system was built and tested within minutes.
 | Component | Technology |
 |-----------|------------|
 | Backend | FastAPI (Python) |
+| Database | MongoDB (with Motor async driver) |
 | Frontend | React + Tailwind CSS |
 | UI Components | shadcn/ui |
-| Database | MongoDB |
-| Authentication | JWT + bcrypt |
-| Styling | Inter font, Clean palette |
+| Authentication | JWT (PyJWT) + bcrypt |
+| Styling | Inter font, Clean & Quiet palette |
+| API Validation | Pydantic |
 
 ---
 
