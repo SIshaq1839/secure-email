@@ -68,12 +68,19 @@ for a secure "Notification-to-Portal" messaging system.
 ## 3. Generating the Application
 
 After I provided the prompt, Emergent's AI assistant (E1) asked me a few clarifying questions:
-- Database preference (MongoDB was already configured in the environment)
-- Port configuration
+- Database preference
+- Port configuration  
 - Authentication requirements
 - Additional features like message expiration
 
-I told the assistant to proceed with whatever takes less effort and is easy to make.
+I replied:
+
+```
+everything is up to you what takes less effort, and easy to make, 
+i already have firestore by the way
+```
+
+The assistant proceeded with MongoDB (already configured in the environment) and default settings.
 
 Within a short time, Emergent generated the full application automatically.
 
