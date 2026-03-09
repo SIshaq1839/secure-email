@@ -184,7 +184,8 @@ That's it! Your SecureBridge app is now running locally at `http://localhost:300
 Once running locally, you have full control to:
 
 - **Add email integration** — Send notification emails with secure links (Resend, SendGrid)
-- **Deploy to your infrastructure** — AWS, Google Cloud, or any hosting provider
+- **Deploy to your infrastructure** — AWS, Google Cloud, Vercel, or any hosting provider
+- **Switch databases** — Migrate to Firestore, PostgreSQL, or any database of your choice
 - **Add compliance features** — Audit logging, activity tracking, data retention policies
 - **Customize the design** — Modify styles, add your branding
 - **Enhance security** — Add 2FA, session management, IP restrictions
